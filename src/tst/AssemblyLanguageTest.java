@@ -62,4 +62,20 @@ public class AssemblyLanguageTest {
 //        assertEquals("ADD $7, $5, $6", result);
 ////        assertEquals(result, "9A040 add $7, $5, $6");
 //    }
+
+    @Test
+    public void LW_iFormatHex_convertedToAssembly() {
+        // correct assembly language for add instruction
+        int instruction = 0x8D070004;
+        String result = assemblyLanguage.convertToAssembly(instruction);
+        assertEquals("lw $7, 4($8)", result);
+    }
+
+    @Test
+    public void SW_iFormatHexNegOffset_convertedToAssembly() {
+        // correct assembly language for add instruction
+        int instruction = 0xAD09FFFC;
+        String result = assemblyLanguage.convertToAssembly(instruction);
+        assertEquals("sw $9, -4($8)", result);
+    }
 }
