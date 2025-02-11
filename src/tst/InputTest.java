@@ -38,10 +38,17 @@ public class InputTest {
     }
 
     @Test
-    public void iFormat_constant_LastSixteenBits() {
+    public void iFormat_posConstant_LastSixteenBits() {
         int hex = 0x8CE90014;
         int constant = input.offset(hex);
         assertEquals(0b0000000000010100, constant); // 0b0000000000010100 == 20
+    }
+
+    @Test
+    public void iFormat_negConstant_LastSixteenBits() {
+//        int hex = 0x8CE90014;
+//        int constant = input.offset(hex);
+//        assertEquals(0b0000000000010100, constant); // 0b0000000000010100 == 20
     }
 
 
