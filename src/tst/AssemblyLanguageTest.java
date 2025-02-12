@@ -1,7 +1,7 @@
 package tst;
 
 import app.AssemblyLanguage;
-import app.Input;
+import app.Transformer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -9,12 +9,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AssemblyLanguageTest {
-    private Input input;
+    private Transformer transformer;
     private AssemblyLanguage assemblyLanguage;
 
     @BeforeEach
     public void init() {
-        input = new Input();
+        transformer = new Transformer();
         assemblyLanguage = new AssemblyLanguage(0x00000000);
     }
 

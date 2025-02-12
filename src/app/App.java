@@ -8,9 +8,10 @@ public class App {
                 0x018C6020, 0x02A4A825, 0x158FFFF7, 0x8ECDFFF0};
 
         int pc_address = 0x0009A040; // the first instruction begins at address hex 9A040
-        AssemblyLanguage disassembler = new AssemblyLanguage(pc_address);
+        AssemblyLanguage disassembler;
 
         for (int instruction: machine_instructions) {
+            disassembler = new AssemblyLanguage(pc_address);
             String assembly = disassembler.convertToAssembly(instruction);
             String output = disassembler.programOutput(pc_address, assembly);
             System.out.println(output);

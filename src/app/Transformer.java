@@ -1,6 +1,6 @@
 package app;
 
-public class Input {
+public class Transformer {
     int hex;
 
     public int firstSixBits(int hexInst) {

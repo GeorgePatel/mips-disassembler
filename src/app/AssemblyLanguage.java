@@ -1,17 +1,21 @@
 package app;
 
 public class AssemblyLanguage {
-    private int address;
-    private String instruction;
-    private final Input input = new Input();
     private int hexInput;
+    private int PC_address;
+    private String instruction;
+    private final Transformer transformer = new Transformer();
 
-    public AssemblyLanguage(int address) {
-        this.address = address;
+    public AssemblyLanguage(int PC_address) {
+        this.PC_address = PC_address;
     }
 
-    public int getAddress() {
-        return address;
+    public int getPC_address() {
+        return PC_address;
+    }
+
+    public void setPC_address(int PC_address) {
+        this.PC_address = PC_address;
     }
 
     public String programOutput(int address, String instruction) {
@@ -20,17 +24,17 @@ public class AssemblyLanguage {
     }
 
     public String convertToAssembly(int hexInst) {
-        int opcode = input.firstSixBits(hexInst);
+        int opcode = transformer.firstSixBits(hexInst);
         if (opcode == 0) {
             return convertToRFormat(hexInst);
         } else {
-            return convertToIFormat(hexInst, opcode, getAddress());
+            return convertToIFormat(hexInst, opcode, getPC_address());
         }
     }
 
     private String convertToRFormat(int hexInst) {
-        int funct = input.lastSixBits(hexInst);
-        RFormat rInst = new RFormat(input.firstRegister(hexInst), input.secondRegister(hexInst), input.thirdRegister(hexInst), 0, funct);
+        int funct = transformer.lastSixBits(hexInst);
+        RFormat rInst = new RFormat(transformer.firstRegister(hexInst), transformer.secondRegister(hexInst), transformer.thirdRegister(hexInst), 0, funct);
         String assemblyInst;
         return switch (funct) {
             case 0b100000 -> {
@@ -58,10 +62,10 @@ public class AssemblyLanguage {
     }
 
     private String convertToIFormat(int hexInst,int opcode, int pc_address) {
-        IFormat iInst = new IFormat(opcode, input.firstRegister(hexInst), input.secondRegister(hexInst), input.offset(hexInst));
+        IFormat iInst = new IFormat(opcode, transformer.firstRegister(hexInst), transformer.secondRegister(hexInst), transformer.offset(hexInst));
+        int offset = iInst.getOffset();
         String assemblyInst;
-        int label = iInst.getOffset();
-        String mylabel;
+        String label;
         switch (opcode) {
             case 0b100011: // lw
                 assemblyInst = String.format("%s $%d, %d($%d)", OPCODE.lw, iInst.getDestRegister(), iInst.getOffset(), iInst.getSrcRegister());
@@ -70,21 +74,27 @@ public class AssemblyLanguage {
                 assemblyInst = String.format("%s $%d, %d($%d)", OPCODE.sw, iInst.getDestRegister(), iInst.getOffset(), iInst.getSrcRegister());
                 return assemblyInst;
             case 0b000100: // beq
-                label = label << 2; // convert the 18 bit offset to 16 bit offset
-                label = label + 4; // account for pc increment
-                label = label + pc_address; // to gain the final relative address that assembler needs to branch to
-                mylabel = Integer.toHexString(label).toUpperCase();
-                assemblyInst = String.format("%s $%d, $%d, address %s", OPCODE.beq, iInst.getSrcRegister(), iInst.getDestRegister(), mylabel);
+                offset = offset << 2; // convert the 18 bit offset to 16 bit offset
+                offset = offset + pc_address + 4; // account for pc increment
+                label = Integer.toHexString(offset).toUpperCase();
+                assemblyInst = String.format("%s $%d, $%d, address %s", OPCODE.beq, iInst.getSrcRegister(), iInst.getDestRegister(), label);
                 return assemblyInst;
             case 0b000101: // bne
-                label = label << 2; // convert the 18 bit offset to 16 bit offset
-                label = label + 4; // account for pc increment
-                label = label + pc_address; // to gain the final relative address that assembler needs to branch to
-                mylabel = Integer.toHexString(label).toUpperCase();
-                assemblyInst = String.format("%s $%d, $%d, address %s", OPCODE.bne, iInst.getSrcRegister(), iInst.getDestRegister(), mylabel);
+                offset = offset << 2; // convert the 18 bit offset to 16 bit offset
+                offset = offset + pc_address + 4; // account for pc increment
+                label = Integer.toHexString(offset).toUpperCase();
+                assemblyInst = String.format("%s $%d, $%d, address %s", OPCODE.bne, iInst.getSrcRegister(), iInst.getDestRegister(), label);
                 return assemblyInst;
             default:
                 return "Instruction not supported.";
         }
+    }
+
+    public void setInstruction(String instruction) {
+        this.instruction = instruction;
+    }
+
+    public void setHexInput(int hexInput) {
+        this.hexInput = hexInput;
     }
 }
