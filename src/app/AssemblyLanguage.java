@@ -4,9 +4,19 @@ public class AssemblyLanguage {
     private int address;
     private String instruction;
     private final Input input = new Input();
+    private int hexInput;
+
+    public AssemblyLanguage(int address) {
+        this.address = address;
+    }
 
     public int getAddress() {
         return address;
+    }
+
+    public String programOutput(int address, String instruction) {
+        String pc_address = Integer.toHexString(address).toUpperCase();
+        return String.format("%s %s", pc_address, instruction);
     }
 
     public String convertToAssembly(int hexInst) {
@@ -50,6 +60,8 @@ public class AssemblyLanguage {
     private String convertToIFormat(int hexInst,int opcode, int pc_address) {
         IFormat iInst = new IFormat(opcode, input.firstRegister(hexInst), input.secondRegister(hexInst), input.offset(hexInst));
         String assemblyInst;
+        int label = iInst.getOffset();
+        String mylabel;
         switch (opcode) {
             case 0b100011: // lw
                 assemblyInst = String.format("%s $%d, %d($%d)", OPCODE.lw, iInst.getDestRegister(), iInst.getOffset(), iInst.getSrcRegister());
@@ -58,17 +70,21 @@ public class AssemblyLanguage {
                 assemblyInst = String.format("%s $%d, %d($%d)", OPCODE.sw, iInst.getDestRegister(), iInst.getOffset(), iInst.getSrcRegister());
                 return assemblyInst;
             case 0b000100: // beq
-                int label = iInst.getOffset();
                 label = label << 2; // convert the 18 bit offset to 16 bit offset
                 label = label + 4; // account for pc increment
-//                label = label + pc_address; // to gain the final relative address that assembler needs to branch to
-                assemblyInst = String.format("%s $%d, $%d, 0x%s", OPCODE.beq, iInst.getSrcRegister(), iInst.getDestRegister(), Integer.toHexString(label));
+                label = label + pc_address; // to gain the final relative address that assembler needs to branch to
+                mylabel = Integer.toHexString(label).toUpperCase();
+                assemblyInst = String.format("%s $%d, $%d, address %s", OPCODE.beq, iInst.getSrcRegister(), iInst.getDestRegister(), mylabel);
                 return assemblyInst;
             case 0b000101: // bne
-                break;
+                label = label << 2; // convert the 18 bit offset to 16 bit offset
+                label = label + 4; // account for pc increment
+                label = label + pc_address; // to gain the final relative address that assembler needs to branch to
+                mylabel = Integer.toHexString(label).toUpperCase();
+                assemblyInst = String.format("%s $%d, $%d, address %s", OPCODE.bne, iInst.getSrcRegister(), iInst.getDestRegister(), mylabel);
+                return assemblyInst;
             default:
                 return "Instruction not supported.";
         }
-        return "";
     }
 }

@@ -15,7 +15,7 @@ public class AssemblyLanguageTest {
     @BeforeEach
     public void init() {
         input = new Input();
-        assemblyLanguage = new AssemblyLanguage();
+        assemblyLanguage = new AssemblyLanguage(0x00000000);
     }
 
     @Test
@@ -84,6 +84,6 @@ public class AssemblyLanguageTest {
         // correct assembly language for add instruction
         int instruction = 0x10640006; // 0x10E30014, 0x00238E00
         String result = assemblyLanguage.convertToAssembly(instruction);
-        assertEquals("beq $3, $4, 0x001C", result);
+        assertEquals("beq $3, $4, address 1C", result);
     }
 }
