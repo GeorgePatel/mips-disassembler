@@ -78,4 +78,12 @@ public class AssemblyLanguageTest {
         String result = assemblyLanguage.convertToAssembly(instruction);
         assertEquals("sw $9, -4($8)", result);
     }
+
+    @Test
+    public void BEQ_iFormatHex_convertedToAssembly() {
+        // correct assembly language for add instruction
+        int instruction = 0x10640006; // 0x10E30014, 0x00238E00
+        String result = assemblyLanguage.convertToAssembly(instruction);
+        assertEquals("beq $3, $4, 0x001C", result);
+    }
 }

@@ -1,17 +1,20 @@
 package app;
 
 public class AssemblyLanguage {
-    private String address;
+    private int address;
     private String instruction;
     private final Input input = new Input();
 
+    public int getAddress() {
+        return address;
+    }
 
     public String convertToAssembly(int hexInst) {
         int opcode = input.firstSixBits(hexInst);
         if (opcode == 0) {
             return convertToRFormat(hexInst);
         } else {
-            return convertToIFormat(hexInst, opcode);
+            return convertToIFormat(hexInst, opcode, getAddress());
         }
     }
 
@@ -44,7 +47,7 @@ public class AssemblyLanguage {
         };
     }
 
-    private String convertToIFormat(int hexInst,int opcode) {
+    private String convertToIFormat(int hexInst,int opcode, int pc_address) {
         IFormat iInst = new IFormat(opcode, input.firstRegister(hexInst), input.secondRegister(hexInst), input.offset(hexInst));
         String assemblyInst;
         switch (opcode) {
@@ -55,7 +58,12 @@ public class AssemblyLanguage {
                 assemblyInst = String.format("%s $%d, %d($%d)", OPCODE.sw, iInst.getDestRegister(), iInst.getOffset(), iInst.getSrcRegister());
                 return assemblyInst;
             case 0b000100: // beq
-                break;
+                int label = iInst.getOffset();
+                label = label << 2; // convert the 18 bit offset to 16 bit offset
+                label = label + 4; // account for pc increment
+//                label = label + pc_address; // to gain the final relative address that assembler needs to branch to
+                assemblyInst = String.format("%s $%d, $%d, 0x%s", OPCODE.beq, iInst.getSrcRegister(), iInst.getDestRegister(), Integer.toHexString(label));
+                return assemblyInst;
             case 0b000101: // bne
                 break;
             default:
