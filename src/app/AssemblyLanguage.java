@@ -74,14 +74,18 @@ public class AssemblyLanguage {
                 assemblyInst = String.format("%s $%d, %d($%d)", OPCODE.sw, iInst.getDestRegister(), iInst.getOffset(), iInst.getSrcRegister());
                 return assemblyInst;
             case 0b000100: // beq
-                offset = offset << 2; // convert the 18 bit offset to 16 bit offset
-                offset = offset + pc_address + 4; // account for pc increment
+                offset = (offset << 2); // convert the 18 bit offset to 16 bit offset
+                offset = (offset + pc_address + 4); // account for pc increment
+                if (offset < 0)
+                    offset = offset & 0xFFFF;
                 label = Integer.toHexString(offset).toUpperCase();
                 assemblyInst = String.format("%s $%d, $%d, address %s", OPCODE.beq, iInst.getSrcRegister(), iInst.getDestRegister(), label);
                 return assemblyInst;
             case 0b000101: // bne
-                offset = offset << 2; // convert the 18 bit offset to 16 bit offset
-                offset = offset + pc_address + 4; // account for pc increment
+                offset = (offset << 2); // convert the 18 bit offset to 16 bit offset
+                offset = (offset + pc_address + 4); // account for pc increment
+                if (offset < 0)
+                    offset = offset & 0xFFFF;
                 label = Integer.toHexString(offset).toUpperCase();
                 assemblyInst = String.format("%s $%d, $%d, address %s", OPCODE.bne, iInst.getSrcRegister(), iInst.getDestRegister(), label);
                 return assemblyInst;
