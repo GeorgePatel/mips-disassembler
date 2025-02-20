@@ -64,6 +64,9 @@ public class AssemblyLanguage {
     private String convertToIFormat(int hexInst,int opcode, int pc_address) {
         IFormat iInst = new IFormat(opcode, transformer.firstRegister(hexInst), transformer.secondRegister(hexInst), transformer.offset(hexInst));
         int offset = iInst.getOffset();
+        if ((offset & 0x8000) != 0) { // Check if the 16th bit is set (negative number)
+            offset |= 0xFFFF0000;  // Sign-extend by setting the upper 16 bits to 1
+        }
         String assemblyInst;
         String label;
         switch (opcode) {
